@@ -1,0 +1,264 @@
+USE [Api]
+GO
+
+/****** Object:  Table [dbo].[DetalleFactura]    Script Date: 14-05-2024 0:30:12 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[DetalleFactura](
+	[DetalleId] [int] IDENTITY(1,1) NOT NULL,
+	[FacturaId] [int] NOT NULL,
+	[IdProducto] [int] NOT NULL,
+	[Cantidad] [int] NOT NULL,
+	[PrecioUnitario] [decimal](10, 2) NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[DetalleId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[DetalleFactura]  WITH CHECK ADD FOREIGN KEY([FacturaId])
+REFERENCES [dbo].[Factura] ([FacturaId])
+GO
+
+ALTER TABLE [dbo].[DetalleFactura]  WITH CHECK ADD FOREIGN KEY([IdProducto])
+REFERENCES [dbo].[Producto] ([IdProducto])
+GO
+
+
+USE [Api]
+GO
+
+/****** Object:  Table [dbo].[Factura]    Script Date: 14-05-2024 0:30:53 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Factura](
+	[FacturaId] [int] IDENTITY(1,1) NOT NULL,
+	[UsuarioId] [int] NOT NULL,
+	[Total] [decimal](10, 2) NOT NULL,
+	[FechaCreacion] [datetime] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[FacturaId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Factura] ADD  DEFAULT (getdate()) FOR [FechaCreacion]
+GO
+
+ALTER TABLE [dbo].[Factura]  WITH CHECK ADD FOREIGN KEY([UsuarioId])
+REFERENCES [dbo].[Usuario] ([UserId])
+GO
+
+
+USE [Api]
+GO
+
+/****** Object:  Table [dbo].[Producto]    Script Date: 14-05-2024 0:31:16 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Producto](
+	[IdProducto] [int] IDENTITY(1,1) NOT NULL,
+	[Codigo] [nvarchar](50) NULL,
+	[Marca] [nvarchar](50) NULL,
+	[Nombre] [nvarchar](100) NULL,
+	[PrecioUnitario] [decimal](10, 2) NULL,
+	[Cantidad] [int] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[IdProducto] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Codigo] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+USE [Api]
+GO
+
+/****** Object:  Table [dbo].[Producto_Carrito]    Script Date: 14-05-2024 0:31:31 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Producto_Carrito](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[UserId] [int] NULL,
+	[IdProducto] [int] NULL,
+	[Cantidad] [int] NULL,
+	[PrecioUnitario] [decimal](10, 2) NULL,
+	[Total]  AS ([Cantidad]*[PrecioUnitario]),
+	[FechaCreacion] [datetime] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Producto_Carrito]  WITH CHECK ADD FOREIGN KEY([IdProducto])
+REFERENCES [dbo].[Producto] ([IdProducto])
+GO
+
+ALTER TABLE [dbo].[Producto_Carrito]  WITH CHECK ADD FOREIGN KEY([UserId])
+REFERENCES [dbo].[Usuario] ([UserId])
+GO
+
+
+USE [Api]
+GO
+
+/****** Object:  Table [dbo].[Rol]    Script Date: 14-05-2024 0:31:48 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Rol](
+	[IDRol] [int] IDENTITY(1,1) NOT NULL,
+	[Descripcion] [nvarchar](100) NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[IDRol] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+
+USE [Api]
+GO
+
+/****** Object:  Table [dbo].[Usuario]    Script Date: 14-05-2024 0:32:03 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[Usuario](
+	[UserId] [int] IDENTITY(1,1) NOT NULL,
+	[Username] [nvarchar](50) NOT NULL,
+	[Password] [varbinary](8000) NULL,
+	[IDRol] [int] NOT NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[UserId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY],
+UNIQUE NONCLUSTERED 
+(
+	[Username] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[Usuario]  WITH CHECK ADD  CONSTRAINT [FK_Usuario_Rol] FOREIGN KEY([IDRol])
+REFERENCES [dbo].[Rol] ([IDRol])
+GO
+
+ALTER TABLE [dbo].[Usuario] CHECK CONSTRAINT [FK_Usuario_Rol]
+GO
+
+
+USE [Api]
+GO
+/****** Object:  StoredProcedure [dbo].[CambiarRolUsuario]    Script Date: 14-05-2024 0:32:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+ALTER PROCEDURE [dbo].[CambiarRolUsuario]
+    @Username NVARCHAR(50),
+    @nuevoIDRol INT
+AS
+BEGIN
+    UPDATE Usuario
+    SET IDRol = @nuevoIDRol
+    WHERE Username = @Username;
+END;
+USE [Api]
+GO
+/****** Object:  StoredProcedure [dbo].[CrearFactura]    Script Date: 14-05-2024 0:32:21 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER   PROCEDURE [dbo].[CrearFactura]
+    @UsuarioId INT,
+    @Total DECIMAL(18, 2),
+    @FechaCreacion DATETIME
+AS
+BEGIN
+    INSERT INTO Factura (UsuarioId, Total, FechaCreacion)
+    VALUES (@UsuarioId, @Total, @FechaCreacion);
+    SELECT SCOPE_IDENTITY() AS FacturaId;  -- Retorna el ID de la factura creada
+END;
+USE [Api]
+GO
+/****** Object:  StoredProcedure [dbo].[CrearUsuario]    Script Date: 14-05-2024 0:32:30 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[CrearUsuario]
+    @username NVARCHAR(50),
+    @password NVARCHAR(255) 
+AS
+BEGIN
+    -- Inserta en la tabla Usuario asegurándose de encriptar la contraseña
+    INSERT INTO Usuario (Username, password, IDRol)
+    VALUES (@username, HASHBYTES('SHA2_256', @password),'4');
+END;
+USE [Api]
+GO
+/****** Object:  StoredProcedure [dbo].[EsAdministrador]    Script Date: 14-05-2024 0:32:38 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[EsAdministrador]
+    @Username NVARCHAR(50)
+AS
+BEGIN
+    -- Suponemos que el IDRol de 'Administrador' es 1
+    SELECT CASE WHEN IDRol = 1 THEN 1 ELSE 0 END AS EsAdmin
+    FROM Usuario
+    WHERE Username = @Username;
+END;
+USE [Api]
+GO
+/****** Object:  StoredProcedure [dbo].[EsContador]    Script Date: 14-05-2024 0:33:13 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER PROCEDURE [dbo].[EsContador]
+    @Username NVARCHAR(50)
+AS
+BEGIN
+
+    SELECT CASE WHEN IDRol = 5 THEN 1 ELSE 0 END AS EsContador
+    FROM Usuario
+    WHERE Username = @Username;
+END;
